@@ -1,0 +1,5 @@
+export type { ProxyRequestParts } from './request-parts.js'
+export { buildProxyRequest } from './request-parts.js'
+export { parseProxyResponse } from './response-parser.js'
+export type { ProxyFactoryOptions } from './proxy-factory.js'
+export { createProxyFunction, createProxyHandler } from './proxy-factory.js'

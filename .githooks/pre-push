@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running ci:local before push..."
+pnpm run ci:local

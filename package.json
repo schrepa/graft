@@ -1,0 +1,31 @@
+{
+  "name": "graft-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "clean": "turbo clean",
+    "audit": "pnpm audit --prod --registry=https://registry.npmjs.org",
+    "ci:local": "pnpm install --frozen-lockfile && pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.3.0",
+    "eslint": "^10.0.2",
+    "tsup": "^8.4.0",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^3.0.0",
+    "zod": "^4.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "hono": ">=4.12.2"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "name": "@schrepa/graft",
+  "version": "0.1.0",
+  "description": "The open-source framework for exposing software to AI agents",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schrepa/graft.git",
+    "directory": "packages/graft"
+  },
+  "homepage": "https://github.com/schrepa/graft/tree/main/packages/graft#readme",
+  "bugs": {
+    "url": "https://github.com/schrepa/graft/issues"
+  },
+  "keywords": [
+    "mcp",
+    "agent",
+    "ai",
+    "openapi",
+    "typescript"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./openapi": {
+      "types": "./dist/openapi.d.ts",
+      "import": "./dist/openapi.mjs",
+      "require": "./dist/openapi.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.mjs",
+      "require": "./dist/server.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.mjs",
+      "require": "./dist/testing.cjs"
+    }
+  },
+  "bin": {
+    "graft": "./dist/cli.mjs"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "lint": "eslint src/ test/",
+    "typecheck": "tsc --project tsconfig.json --noEmit && tsc --project tsconfig.test.json --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "commander": "^13.0.0",
+    "yaml": "^2.7.0"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "tsx": "^4.0.0",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tsx": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
+  },
+  "license": "Apache-2.0"
+}
