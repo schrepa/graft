@@ -1,11 +1,14 @@
 ---
 name: graft
 description: >-
-  Use when building, refactoring, or documenting Graft apps and proxies.
-  Graft's core thesis: define tools once and serve them as both HTTP REST
-  endpoints and MCP tools from the same server, with discovery, docs, and
-  OpenAPI generated automatically. Covers tool/resource/prompt design, auth,
-  transports, CLI, and docs.
+  Use when building, refactoring, or documenting Graft apps and proxies,
+  including when asked to create a tool server, API server, dual-protocol
+  server, or MCP-HTTP bridge. Graft's core thesis: define tools once and serve
+  them as both HTTP REST endpoints and MCP tools from the same server, with
+  discovery, docs, and OpenAPI generated automatically. Covers concrete actions
+  such as defining tools and handlers, configuring authentication middleware,
+  setting up HTTP and stdio transports, generating OpenAPI documentation,
+  wrapping existing APIs via proxy mode, and wiring up the full CLI workflow.
 ---
 
 # Graft
@@ -50,6 +53,79 @@ When explaining Graft, lead with all three parts. When showing examples, demonst
 - App authoring: [references/app-authoring.md](references/app-authoring.md)
 - Proxy/OpenAPI wrapping: [references/proxy-openapi.md](references/proxy-openapi.md)
 - Validation, docs, and release hygiene: [references/validation-release.md](references/validation-release.md)
+
+## Quick examples
+
+### Inline tool — both access patterns
+
+```ts
+import { createApp } from '@schrepa/graft'
+import { z } from 'zod'
+
+const app = createApp()
+
+app.tool('list_items', {
+  description: 'List items matching a query.',
+  params: z.object({ q: z.string() }),
+  auth: true,
+  handler: async ({ q }) => ({
+    items: ['hello', 'world'].filter((item) => item.includes(q)),
+  }),
+})
+
+export default app
+```
+
+**MCP (`tools/call`):**
+```json
+{ "method": "tools/call", "params": { "name": "list_items", "arguments": { "q": "hello" } } }
+```
+
+**HTTP equivalent:**
+```
+GET /list-items?q=hello
+Authorization: Bearer <token>
+```
+
+The same handler, auth middleware, and validation run for both.
+
+### Proxy mode — `graft.proxy.yaml`
+
+```yaml
+target: https://petstore3.swagger.io/api/v3
+tools:
+  - method: GET
+    path: /pet/findByStatus
+    name: find_pets_by_status
+    description: Find pets by status.
+    parameters:
+      type: object
+      properties:
+        status:
+          type: string
+  - method: POST
+    path: /pet
+    name: create_pet
+    description: Create a pet.
+    parameters:
+      type: object
+      properties:
+        name:
+          type: string
+      required: [name]
+```
+
+Start the proxy server:
+```
+graft serve --config graft.proxy.yaml
+```
+
+Graft exposes each configured operation as both an HTTP endpoint and an MCP tool, and auto-generates `/openapi.json`, `/docs`, and discovery files.
+
+For the direct OpenAPI path, use:
+```
+graft serve --openapi ./openapi.yaml --target https://api.example.com
+```
 
 ## Guardrails
 
