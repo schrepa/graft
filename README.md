@@ -5,19 +5,21 @@ Build agent-ready APIs without splitting your server model.
 Define tools once, then expose them as both HTTP endpoints and [MCP](https://modelcontextprotocol.io) tools from the same server. Graft also generates discovery docs, OpenAPI, and an interactive API reference automatically.
 
 ```typescript
-import { createApp, z } from '@schrepa/graft'
+import { createApp } from '@schrepa/graft'
 
-const app = createApp({ name: 'my-docs-api' })
+const app = createApp()
 
-app.tool('search_docs', {
-  description: 'Search documentation by keyword',
-  params: z.object({
-    q: z.string().describe('Search query'),
-    limit: z.coerce.number().optional().describe('Max results'),
-  }),
-  handler: ({ q, limit }) => {
-    return searchIndex(q, { limit: limit ?? 10 })
+app.tool('lookup_user', {
+  description: 'Look up a user by id.',
+  auth: true,
+  inputSchema: {
+    type: 'object',
+    properties: {
+      id: { type: 'string' },
+    },
+    required: ['id'],
   },
+  handler: ({ id }) => ({ id, found: true }),
 })
 
 export default app
@@ -26,7 +28,7 @@ export default app
 That one definition gives you:
 
 - **`POST /mcp`** — MCP endpoint (Streamable HTTP). Agents connect here.
-- **`GET /search-docs?q=deploy`** — HTTP endpoint. Any client calls the same tool as REST.
+- **`GET /lookup-user?id=123`** — HTTP endpoint. Any client calls the same tool as REST.
 - **`/.well-known/agent.json`** — Agent discovery. Tools, resources, capabilities.
 - **`/.well-known/mcp.json`** — MCP server card. Protocol version and transport URL.
 - **`/openapi.json`** — Auto-generated OpenAPI 3.1 spec.
@@ -36,8 +38,8 @@ That one definition gives you:
 Both transports share a single pipeline:
 
 ```
-Agent (MCP)  → POST /mcp           → auth → validate → middleware → handler
-Browser      → GET /search-docs?q= → auth → validate → middleware → handler
+Agent (MCP)  → POST /mcp              → auth → validate → middleware → handler
+Browser      → GET /lookup-user?id=123 → auth → validate → middleware → handler
 ```
 
 One handler. Two protocols. Same auth, same validation, same middleware.
